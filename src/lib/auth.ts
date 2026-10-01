@@ -2,23 +2,24 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { MongoClient } from "mongodb";
 
-const mongoUrl = process.env.BETTER_AUTH_DB_URL;
+const mongoUrl =
+  process.env.BETTER_AUTH_DB_URL ??
+  process.env.MONGODB_URI ??
+  "mongodb://127.0.0.1:27017/my_result";
 
-if (!mongoUrl) {
-  throw new Error("BETTER_AUTH_DB_URL is not defined");
-}
+const dbName = process.env.MONGODB_DB ?? "my_result";
 
 const client = new MongoClient(mongoUrl);
-await client.connect()
-const db = client.db('my_result');
+await client.connect();
+const db = client.db(dbName);
 
 export const auth = betterAuth({
-  emailAndPassword:{
+  emailAndPassword: {
     enabled: true,
   },
-  database: mongodbAdapter(db),
-  baseURL: "http://localhost:3000",
-    // ...existing code...
-
+  database: mongodbAdapter(db, {
+    transaction: false,
+  }),
+  baseURL: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
 });
 
