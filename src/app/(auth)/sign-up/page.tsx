@@ -1,10 +1,11 @@
 "use client";
-import {authClient} from "../../../lib/auth-client"
+import {authClient, signIn} from "../../../lib/auth-client"
 
 import {Check} from "@gravity-ui/icons";
 import {Button, Description, FieldError, Form, Input, Label, TextField} from "@heroui/react";
 
 export default function Basic() {
+ 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -27,6 +28,12 @@ export default function Basic() {
     alert("Sign up successful");
    }
   };
+  const signInWithGoogle = async () => {
+  await signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    })
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center">
@@ -46,20 +53,7 @@ export default function Basic() {
                   <Input placeholder="John Doe" />
                   <FieldError />
                 </TextField>
-      <TextField
-        name="age"
-        validate={(value) => {
-          if (value && value.trim().length < 18) {
-            return "Age must be at least 18";
-          }
-
-          return null;
-        }}
-      >
-        <Label>Age</Label>
-        <Input placeholder="Enter your age" />
-        <FieldError />
-      </TextField>
+      
 
       <TextField
         isRequired
@@ -112,8 +106,13 @@ export default function Basic() {
           Reset
         </Button>
       </div>
+     
     </Form>
+      <button onClick={signInWithGoogle} className="btn btn-primary mt-4">
+      Sign in with Google
+    </button>
     </div>
+   
     </div>
   );
 }

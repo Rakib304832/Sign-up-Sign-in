@@ -25,7 +25,7 @@ export default function SignInPage() {
     const { error } = await authClient.signIn.email({
       email: data.email,
       password: data.password,
-      callbackkURL: "/"
+      callbackURL: "/",
     });
 
     if (error) {

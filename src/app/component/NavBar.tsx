@@ -30,17 +30,17 @@ const NavBar = () => {
 
         
         <div className="flex flex-none items-center justify-end gap-4">
-          {isPending ? null : session ? ( // চেক চলাকালীন খালি, লগইন থাকলে Logout
+          {isPending ? null : session ? ( 
             <>
-              <span>{session.user.name}</span> {/* ইউজারের নাম */}
+              <span>{session.user.name}</span> 
               <button
                 className="btn btn-active rounded-full"
-                onClick={() => authClient.signOut()} // লগআউট করে সেশন মুছে ফেলে
+                onClick={() => authClient.signOut()}
               >
                 Logout
               </button>
             </>
-          ) : ( // লগইন না থাকলে আগের দুই বাটন
+          ) : ( 
             <>
               <Link href="/sign-in">
                 <button className="btn btn-active rounded-full">Login</button>
@@ -52,8 +52,8 @@ const NavBar = () => {
           )}
         </div>
 
-      </div> {/* navbar শেষ */}
-    </div> /* বাইরের র‍্যাপার শেষ */
+      </div> 
+    </div> 
   );
 };
 
