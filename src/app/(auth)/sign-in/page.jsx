@@ -1,5 +1,6 @@
 "use client";
 import { authClient } from "../../../lib/auth-client";
+import { useRouter } from "next/navigation";
 import {
   Button,
   Description,
@@ -11,6 +12,7 @@ import {
 } from "@heroui/react";
 
 export default function SignInPage() {
+  const router = useRouter();
   const onSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -23,6 +25,7 @@ export default function SignInPage() {
     const { error } = await authClient.signIn.email({
       email: data.email,
       password: data.password,
+      callbackkURL: "/"
     });
 
     if (error) {
@@ -30,7 +33,8 @@ export default function SignInPage() {
       return;
     }
 
-    alert("Sign in successful");
+    router.push("/");
+    router.refresh();
   };
 
   return (
