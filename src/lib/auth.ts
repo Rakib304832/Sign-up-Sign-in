@@ -3,7 +3,17 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { MongoClient } from "mongodb";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resendFromEmail =
+  process.env.RESEND_FROM_EMAIL ?? "Acme <onboarding@resend.dev>";
+
+if (!resendApiKey) {
+  console.warn(
+    "[auth] Missing RESEND_API_KEY. Email verification and password reset emails will fail until it is added to .env.local."
+  );
+}
+
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 const mongoUrl =
   process.env.BETTER_AUTH_DB_URL ??
@@ -15,13 +25,35 @@ const client = new MongoClient(mongoUrl);
 await client.connect();
 const db = client.db(dbName);
 
+async function sendEmailWithResend({
+  to,
+  subject,
+  html,
+}: {
+  to: string[];
+  subject: string;
+  html: string;
+}) {
+  if (!resend) {
+    throw new Error(
+      "RESEND_API_KEY is missing. Add it to your .env.local file before enabling email verification."
+    );
+  }
+
+  return resend.emails.send({
+    from: resendFromEmail,
+    to,
+    subject,
+    html,
+  });
+}
+
 export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
-      await resend.emails.send({
-        from: "Acme <onboarding@resend.dev>",
+      await sendEmailWithResend({
         to: [user.email],
         subject: "Reset your password",
         html: `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
@@ -31,9 +63,9 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
+      
       console.log("Sending email verification to:", user.email, "with URL:", url);
-      const { data, error } = await resend.emails.send({
-        from: "Acme <onboarding@resend.dev>",
+      const { data, error } = await sendEmailWithResend({
         to: [user.email],
         subject: "Verify your email",
         html: `<p>Click <a href="${url}">here</a> to verify your email.</p>`,

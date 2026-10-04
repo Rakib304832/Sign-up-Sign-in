@@ -1,6 +1,8 @@
 "use client";
 import { authClient } from "../../../lib/auth-client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 import {
   Button,
   Description,
@@ -79,6 +81,9 @@ export default function SignInPage() {
           </TextField>
 
           <Button type="submit">Sign in</Button>
+          <Link href="/component/forget-passard" className="text-center text-sm text-gray-500 hover:underline">
+            <p>Forget Password?</p>
+          </Link>
         </Form>
       </div>
     </div>
